@@ -1,0 +1,279 @@
+<!doctype html>
+<html lang="id">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta name="theme-color" content="#f5f1e8">
+	<title>Ide Acak - Studio Kecil</title>
+	<style>
+		:root {
+			color-scheme: light;
+			--paper: #f5f1e8;
+			--ink: #20231f;
+			--muted: #73766d;
+			--line: #d9d5ca;
+			--lime: #d5f36a;
+			--orange: #f4774b;
+			--card: #fffdf7;
+			font-family: "Trebuchet MS", "Segoe UI", sans-serif;
+		}
+
+		* { box-sizing: border-box; }
+
+		body {
+			margin: 0;
+			min-width: 320px;
+			min-height: 100vh;
+			color: var(--ink);
+			background-color: var(--paper);
+			background-image: radial-gradient(#c9c5b9 0.7px, transparent 0.7px);
+			background-size: 18px 18px;
+		}
+
+		button { font: inherit; }
+
+		.shell {
+			width: min(1080px, calc(100% - 40px));
+			margin: 0 auto;
+		}
+
+		header {
+			min-height: 74px;
+			display: flex;
+			align-items: center;
+			justify-content: space-between;
+			border-bottom: 1px solid var(--line);
+		}
+
+		.brand { display: flex; align-items: center; gap: 11px; font-weight: 800; }
+		.brand-mark { width: 28px; height: 28px; background: var(--orange); border-radius: 50%; position: relative; }
+		.brand-mark::after { content: ""; position: absolute; width: 8px; height: 8px; background: var(--ink); border-radius: 50%; top: 5px; right: 3px; }
+		.edition { color: var(--muted); font-size: 12px; letter-spacing: 1px; text-transform: uppercase; }
+
+		main { padding: 70px 0 52px; }
+
+		.intro { max-width: 700px; animation: arrive 500ms ease both; }
+		.eyebrow { color: #526327; font-size: 12px; font-weight: 800; letter-spacing: 1.8px; text-transform: uppercase; }
+		h1 { margin: 14px 0 12px; font-size: clamp(42px, 8vw, 78px); line-height: 0.98; letter-spacing: -2px; }
+		.intro p { max-width: 540px; margin: 0; color: var(--muted); font-size: 17px; line-height: 1.65; }
+
+		.workspace { display: grid; grid-template-columns: minmax(0, 1.5fr) minmax(250px, 0.8fr); gap: 22px; margin-top: 42px; }
+
+		.idea-card, .side-panel { border: 1px solid var(--line); border-radius: 8px; background: var(--card); }
+		.idea-card { min-height: 355px; padding: 30px; position: relative; overflow: hidden; }
+		.idea-card::after { content: "?"; position: absolute; right: 18px; bottom: -46px; color: #f1eee4; font-size: 220px; line-height: 1; font-weight: 900; pointer-events: none; }
+		.card-top { position: relative; z-index: 1; display: flex; justify-content: space-between; align-items: center; }
+		.number { color: var(--muted); font-size: 12px; font-weight: 700; }
+		.tag { padding: 7px 10px; border-radius: 99px; background: var(--lime); font-size: 11px; font-weight: 800; text-transform: uppercase; }
+		.idea-text { position: relative; z-index: 1; max-width: 620px; margin: 42px 0 32px; font-size: clamp(24px, 4vw, 38px); line-height: 1.28; font-weight: 700; }
+		.idea-text span { text-decoration: underline; text-decoration-color: var(--orange); text-decoration-thickness: 4px; text-underline-offset: 5px; }
+
+		.actions { position: relative; z-index: 1; display: flex; flex-wrap: wrap; gap: 10px; }
+		.button { min-height: 44px; display: inline-flex; align-items: center; justify-content: center; gap: 9px; padding: 0 16px; border: 1px solid var(--ink); border-radius: 5px; color: var(--ink); background: transparent; cursor: pointer; font-weight: 750; transition: transform 140ms ease, background 140ms ease; }
+		.button:hover { transform: translateY(-2px); }
+		.button:focus-visible { outline: 3px solid var(--orange); outline-offset: 3px; }
+		.button-primary { background: var(--ink); color: white; }
+		.button-primary:hover { background: #3b4138; }
+		.button-quiet { border-color: var(--line); }
+
+		.side-panel { padding: 22px; }
+		.side-panel h2 { margin: 0 0 5px; font-size: 17px; }
+		.side-panel > p { margin: 0 0 20px; color: var(--muted); font-size: 13px; line-height: 1.5; }
+		.palette { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+		.swatch { min-width: 0; }
+		.swatch-color { height: 62px; border: 1px solid #00000012; border-radius: 4px; }
+		.swatch code { display: block; margin-top: 7px; color: var(--muted); font-size: 10px; text-align: center; }
+		.divider { height: 1px; margin: 24px 0 20px; background: var(--line); }
+		.recent-list { display: grid; gap: 10px; padding: 0; margin: 0; list-style: none; }
+		.recent-list li { display: grid; grid-template-columns: 25px 1fr; gap: 8px; color: var(--muted); font-size: 12px; line-height: 1.4; }
+		.recent-index { color: var(--orange); font-weight: 800; }
+		.empty-state { color: var(--muted); font-size: 12px; }
+
+		footer { display: flex; justify-content: space-between; gap: 16px; padding: 18px 0 24px; border-top: 1px solid var(--line); color: var(--muted); font-size: 11px; }
+		.status { min-height: 18px; color: #526327; font-weight: 700; }
+
+		@keyframes arrive { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+		@media (max-width: 720px) {
+			main { padding-top: 48px; }
+			.workspace { grid-template-columns: 1fr; margin-top: 30px; }
+			.idea-card { min-height: 320px; padding: 22px; }
+			.idea-text { margin-top: 36px; }
+			.side-panel { padding: 20px; }
+			.swatch-color { height: 52px; }
+		}
+
+		@media (max-width: 420px) {
+			.shell { width: min(100% - 28px, 1080px); }
+			.edition { font-size: 10px; }
+			.idea-card { padding: 18px; }
+			.actions .button { flex: 1 1 auto; padding: 0 10px; }
+			footer { flex-direction: column; }
+		}
+	</style>
+</head>
+<body>
+	<div class="shell">
+		<header>
+			<div class="brand"><span class="brand-mark" aria-hidden="true"></span><span>studio kecil</span></div>
+			<div class="edition">Mesin ide no. 01</div>
+		</header>
+
+		<main>
+			<section class="intro" aria-labelledby="page-title">
+				<div class="eyebrow">Sedikit acak, banyak kemungkinan</div>
+				<h1 id="page-title">Lagi buntu?<br>Putar saja.</h1>
+				<p>Campur sebuah tema, tugas, dan kejutan kecil. Siapa tahu ide berikutnya datang dari kombinasi yang tidak kamu rencanakan.</p>
+			</section>
+
+			<section class="workspace" aria-label="Generator ide">
+				<article class="idea-card" aria-live="polite">
+					<div class="card-top">
+						<span class="number" id="idea-number">IDE #001</span>
+						<span class="tag" id="idea-tag">Kreasi</span>
+					</div>
+					<p class="idea-text" id="idea-text">Buat sebuah <span>poster acara musik</span> dengan gaya yang terinspirasi dari pasar malam, lalu tambahkan satu detail yang tidak masuk akal.</p>
+					<div class="actions">
+						<button class="button button-primary" id="generate-button" type="button"><span aria-hidden="true">&#8635;</span> Acak lagi</button>
+						<button class="button button-quiet" id="copy-button" type="button"><span aria-hidden="true">&#9638;</span> Salin ide</button>
+					</div>
+				</article>
+
+				<aside class="side-panel" aria-label="Palet dan ide sebelumnya">
+					<h2>Palet hari ini</h2>
+					<p>Empat warna acak untuk jadi titik awal.</p>
+					<div class="palette" id="palette" aria-label="Palet warna"></div>
+					<div class="divider"></div>
+					<h2>Baru saja</h2>
+					<p>Ide yang sempat mampir.</p>
+					<ol class="recent-list" id="recent-list"></ol>
+				</aside>
+			</section>
+		</main>
+
+		<footer>
+			<span>Dibuat untuk hari-hari yang butuh percikan kecil.</span>
+			<span class="status" id="status" role="status" aria-live="polite"></span>
+			<span id="year-label"></span>
+		</footer>
+	</div>
+
+	<script>
+		const subjects = [
+			"poster acara musik", "kemasan minuman herbal", "sampul zine lokal",
+			"halaman depan toko bunga", "maskot untuk klub membaca", "kartu pos dari masa depan",
+			"aplikasi pencatat mimpi", "menu sarapan di planet Mars", "peta harta karun kota",
+			"identitas visual kedai mi", "undangan pesta kebun", "sampul album suara hujan"
+		];
+
+		const settings = [
+			"pasar malam", "stasiun kereta yang sepi", "hutan setelah hujan",
+			"arsip keluarga tahun 1980", "kebun sayur di atap", "ruang tunggu yang nyaman",
+			"toko alat tulis tua", "pantai pada pukul lima pagi", "kota kecil di dalam botol",
+			"planet yang seluruhnya terbuat dari kaca", "pesta ulang tahun sederhana", "radio tengah malam"
+		];
+
+		const twists = [
+			"tambahkan satu detail yang tidak masuk akal", "gunakan hanya bentuk-bentuk bulat",
+			"sembunyikan sebuah pesan rahasia", "buat semuanya terasa seperti sedang bergerak",
+			"pilih satu warna yang biasanya tidak cocok", "ceritakan dua hal sekaligus tanpa kata-kata",
+			"buat versi yang tetap menarik dalam ukuran perangko", "sisakan ruang untuk kejutan",
+			"bayangkan benda ini ditemukan seratus tahun lagi", "masukkan satu elemen yang bisa disentuh",
+			"buat aturan kecil lalu langgar aturan itu sekali", "mulai dari sesuatu yang biasanya dibuang"
+		];
+
+		const categories = ["Kreasi", "Eksperimen", "Cerita", "Tantangan"];
+		const colors = [
+			"#ef7353", "#e9c46a", "#658b78", "#4f5d75", "#d8a7a1", "#a9c66b",
+			"#f0a34a", "#6d7d8b", "#bb8fce", "#5b8e9a", "#e3aa37", "#b45d45",
+			"#799c72", "#e7a6bc", "#527a9b", "#b5a07a", "#8d6e63", "#a3b18a"
+		];
+
+		const ideaText = document.querySelector("#idea-text");
+		const ideaNumber = document.querySelector("#idea-number");
+		const ideaTag = document.querySelector("#idea-tag");
+		const recentList = document.querySelector("#recent-list");
+		const palette = document.querySelector("#palette");
+		const status = document.querySelector("#status");
+		let counter = 1;
+		let recentIdeas = [];
+
+		function pick(items) {
+			return items[Math.floor(Math.random() * items.length)];
+		}
+
+		function makeIdea() {
+			const subject = pick(subjects);
+			const setting = pick(settings);
+			const twist = pick(twists);
+			return `Buat sebuah ${subject} dengan gaya yang terinspirasi dari ${setting}, lalu ${twist}.`;
+		}
+
+		function renderPalette() {
+			const chosen = [...colors].sort(() => Math.random() - 0.5).slice(0, 4);
+			palette.replaceChildren();
+			chosen.forEach((color) => {
+				const item = document.createElement("div");
+				item.className = "swatch";
+				const sample = document.createElement("div");
+				sample.className = "swatch-color";
+				sample.style.backgroundColor = color;
+				sample.setAttribute("aria-label", `Warna ${color}`);
+				const label = document.createElement("code");
+				label.textContent = color;
+				item.append(sample, label);
+				palette.append(item);
+			});
+		}
+
+		function renderRecent() {
+			recentList.replaceChildren();
+			if (recentIdeas.length === 0) {
+				const empty = document.createElement("li");
+				empty.className = "empty-state";
+				empty.textContent = "Belum ada ide lain.";
+				recentList.append(empty);
+				return;
+			}
+			recentIdeas.slice(0, 3).forEach((idea, index) => {
+				const item = document.createElement("li");
+				const number = document.createElement("span");
+				number.className = "recent-index";
+				number.textContent = String(index + 1).padStart(2, "0");
+				const text = document.createElement("span");
+				text.textContent = idea;
+				item.append(number, text);
+				recentList.append(item);
+			});
+		}
+
+		function generateIdea() {
+			const nextIdea = makeIdea();
+			recentIdeas.unshift(ideaText.textContent);
+			recentIdeas = recentIdeas.slice(0, 3);
+			ideaText.textContent = nextIdea;
+			ideaNumber.textContent = `IDE #${String(counter).padStart(3, "0")}`;
+			ideaTag.textContent = pick(categories);
+			counter += 1;
+			renderRecent();
+			renderPalette();
+			status.textContent = "Ide baru siap.";
+		}
+
+		async function copyIdea() {
+			try {
+				await navigator.clipboard.writeText(ideaText.textContent);
+				status.textContent = "Ide disalin ke clipboard.";
+			} catch {
+				status.textContent = "Clipboard tidak tersedia di halaman ini.";
+			}
+		}
+
+		document.querySelector("#generate-button").addEventListener("click", generateIdea);
+		document.querySelector("#copy-button").addEventListener("click", copyIdea);
+		document.querySelector("#year-label").textContent = `STUDIO KECIL / ${new Date().getFullYear()}`;
+		renderPalette();
+		renderRecent();
+	</script>
+</body>
+</html>
